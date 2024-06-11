@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+   nginx:
+      restart: always
+      image: nginx:latest
+      container_name: main-ng
+      volumes:
+        - "./nginx.conf:/etc/nginx/nginx.conf"
+      ports:
+        - "8000:80"
+      networks:
+        - host
+        
+networks:
+  host:
+    driver: bridge
+      
+        
+       
+    

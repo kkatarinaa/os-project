@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  php:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php-site
+    volumes:
+      - "./src/:/var/www/html"
+    depends_on:
+      - mysql
+
+  nginx:
+    restart: always
+    image: nginx:latest
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
+      - "./src/:/var/www/html"
+    container_name: nginx-site
+    ports:
+      - 10000:80
+    depends_on:
+      - mysql
+
+  mysql:
+    restart: always
+    image: mysql:latest
+    container_name: mysql-site
+    environment:
+      MYSQL_DATABASE: project_os
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_HOST: "%"
+    ports: 
+      - '3306:3306'
+    volumes:
+      - "./db/:/docker-entrypoint-initdb.d"
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    restart: always
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-site
+    environment:
+     - PMA_HOST=mysql
+     - PMA_PORT=3306
+     - MYSQL_ROOT_PASSWORD=root
+    ports:
+     - 10001:80
+    depends_on:
+     - mysql
+      
+volumes:
+  db_data:
